@@ -2,6 +2,7 @@ import discord
 import json
 import asyncio
 from discord.ext import commands
+import os
 
 intents = discord.Intents.default()
 intents.members = True  # 멤버 관련 이벤트 처리
@@ -100,4 +101,5 @@ async def on_member_join(member):
     except discord.Forbidden:
         print(f"{member.name}님에게 DM을 보낼 수 없습니다.")
 
-bot.run('MTI4MzM5Mjg0NTIzNDgzMTQzMg.G9qjHz.gnsUaGD8XoVQP2Rcw4nlU7ilClNJceVg4jdOmM')
+# 환경 변수에서 디스코드 토큰을 읽어오기
+bot.run(os.getenv('DISCORD_TOKEN'))

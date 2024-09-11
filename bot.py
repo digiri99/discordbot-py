@@ -4,6 +4,7 @@ import asyncio
 from discord.ext import commands
 import os
 
+# Intents 설정
 intents = discord.Intents.default()
 intents.members = True  # 멤버 관련 이벤트 처리
 intents.message_content = True  # 메시지 콘텐츠 처리
@@ -21,14 +22,14 @@ def load_members():
 # 정회원 기록을 저장
 def save_members(data):
     with open("members.json", "w") as f:
-        json.dump(data, f)
+        json.dump(data, f, ensure_ascii=False, indent=4)
 
 # 봇이 준비되었을 때
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user}')
 
-# 유저가 서버에 입장할 때 "준회원" 또는 "정회원" 역할 부여
+# 유저가 서버에 입장할 때 "준회원" 역할 부여 및 정회원 등록 프로세스 시작
 @bot.event
 async def on_member_join(member):
     try:
@@ -38,10 +39,12 @@ async def on_member_join(member):
             await member.add_roles(role)
 
         # DM 보내기
-        await member.send("환영합니다! 정회원 등록을 위해 닉네임과 휴대폰 번호를 입력해주세요.\n\n"
-                          "입력 형식:\n"
-                          "게임 닉네임과 휴대폰 번호를 공백으로 구분하여 입력해 주세요.\n"
-                          "예시: 닉네임 01077778888")
+        await member.send(
+            "환영합니다! 정회원 등록을 위해 닉네임과 휴대폰 번호를 입력해주세요.\n\n"
+            "입력 형식:\n"
+            "게임 닉네임과 휴대폰 번호를 공백으로 구분하여 입력해 주세요.\n"
+            "예시: 닉네임 01077778888"
+        )
 
         # 사용자 응답 기다리기
         def check(msg):
@@ -50,19 +53,19 @@ async def on_member_join(member):
         try:
             msg = await bot.wait_for('message', timeout=300.0, check=check)
             content = msg.content.split()
-            
+
             if len(content) == 2:
                 닉네임 = content[0].strip()
                 번호 = content[1].strip()
 
-                if len(번호) == 11:  # 11자리 휴대폰 번호 검증
+                if len(번호) == 11 and 번호.isdigit():  # 11자리 숫자 휴대폰 번호 검증
                     try:
                         await member.edit(nick=닉네임)  # 닉네임 변경
-                        role = discord.utils.get(member.guild.roles, name="정회원")
+                        정회원_role = discord.utils.get(member.guild.roles, name="정회원")
                         준회원_role = discord.utils.get(member.guild.roles, name='준회원')
 
-                        if role:
-                            await member.add_roles(role)  # 정회원 역할 부여
+                        if 정회원_role:
+                            await member.add_roles(정회원_role)  # 정회원 역할 부여
                         if 준회원_role:
                             await member.remove_roles(준회원_role)  # 준회원 역할 제거
 

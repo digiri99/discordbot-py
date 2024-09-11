@@ -1,8 +1,8 @@
 name: Run Discord Bot
 
 on:
-  schedule:
-    - cron: '*/30 * * * *'  # 매 30분마다 실행
+  push:
+    branches: [ main ]
   workflow_dispatch:  # 수동으로 실행 가능
 
 jobs:
@@ -16,7 +16,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5  # 최신 버전 사용
       with:
-        python-version: '3.9'  # Python 버전 선택
+        python-version: '3.9'  # 원하는 Python 버전 (예: 3.9)
 
     - name: Install dependencies
       run: |
@@ -27,4 +27,4 @@ jobs:
       run: |
         python bot.py
       env:
-        DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+        DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}  # GitHub Secrets에서 토큰 설정
